@@ -1,0 +1,22 @@
+{
+    "name": "wteam/request",
+    "type": "symfony-bundle",
+    "description": "",
+    "require": {
+        "psr/log": "^1.1",
+        "symfony/dom-crawler": "^5.0",
+        "symfony/http-client": "^5.0",
+        "symfony/options-resolver": "^5.0",
+        "symfony/config": "^5.0",
+        "symfony/orm-pack": "^1.0"
+    },
+    "autoload": {
+        "psr-4": { "WTeam\\RequestBundle\\": "" }
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

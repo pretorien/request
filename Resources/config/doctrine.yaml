@@ -1,0 +1,9 @@
+doctrine:
+    orm:
+        mappings:
+            RequestBundle:
+                is_bundle: true
+                type: annotation
+                dir: 'Entity'
+                prefix: 'WTeam\RequestBundle\Entity'
+                mapping: true

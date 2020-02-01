@@ -1,0 +1,49 @@
+services:
+
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        public: false       # Allows optimizing the container by removing unused services; this also means
+                            # fetching services directly from the container via $container->get() won't work.
+                            # The best practice is to be explicit about your dependencies anyway.
+
+    # monolog.db_handler:
+    #     class: WTeam\RequestBundle\Util\MonologDBHandler
+    #     arguments: ['@doctrine.orm.entity_manager']
+
+    WTeam\RequestBundle\:
+        resource: '../*'
+        exclude: '../{DependencyInjection,Entity,Migrations,Tests}'
+
+    WTeam\RequestBundle\Repository\ProxyRepository:
+        autowire: true
+        tags: ['doctrine.repository_service']
+
+    WTeam\RequestBundle\Service\RequestService:
+        public: true
+        arguments:
+            $configuration: "%request%"
+            $logger: "@logger"
+    wteam.request:
+        alias: WTeam\RequestBundle\Service\RequestService
+        public: true
+
+    WTeam\RequestBundle\Service\ProxyService:
+        public: true
+    wteam.proxy:
+        alias: WTeam\RequestBundle\Service\ProxyService
+        public: true
+
+    WTeam\RequestBundle\Command\ProxyNordvpnCommand:
+        tags:
+            - { name: 'console.command', command: 'proxy:nordvpn:fetch' }
+        arguments:
+            $configuration: "%proxy%"
+
+    WTeam\RequestBundle\Command\ProxyLatencyCommand:
+        tags:
+            - { name: 'console.command', command: 'proxy:check' }
+
+    WTeam\RequestBundle\Command\ProxyListCommand:
+        tags:
+            - { name: 'console.command', command: 'proxy:list' }
