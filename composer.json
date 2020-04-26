@@ -1,17 +1,20 @@
 {
-    "name": "wteam/request",
+    "name": "pretorien/request",
     "type": "symfony-bundle",
     "description": "",
+    "keywords": ["request","proxy","nordvpn"],
     "require": {
         "psr/log": "^1.1",
         "symfony/dom-crawler": "^5.0",
         "symfony/http-client": "^5.0",
         "symfony/options-resolver": "^5.0",
         "symfony/config": "^5.0",
-        "symfony/orm-pack": "^1.0"
+        "symfony/orm-pack": "^1.0",
+        "symfony/browser-kit": "^5.0",
+        "nyholm/psr7": "^1.2"
     },
     "autoload": {
-        "psr-4": { "WTeam\\RequestBundle\\": "" }
+        "psr-4": { "Pretorien\\RequestBundle\\": "" }
     },
     "minimum-stability": "dev",
     "extra": {

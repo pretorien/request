@@ -1,6 +1,6 @@
 <?php
 
-namespace  WTeam\RequestBundle\Exception;
+namespace  Pretorien\RequestBundle\Exception;
 
 class RequestException extends \Exception
 {

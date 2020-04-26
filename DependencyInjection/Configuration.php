@@ -1,6 +1,6 @@
 <?php
 
-namespace WTeam\RequestBundle\DependencyInjection;
+namespace Pretorien\RequestBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -29,16 +29,14 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end()
-            ->arrayNode('myip')
-                ->addDefaultsIfNotSet()
-                ->children()
-                    ->scalarNode('uri')
-                        // ->defaultValue("https://api6.ipify.org?format=json")
-                        ->defaultValue("https://api.myip.com")
-                        ->isRequired()
-                        ->cannotBeEmpty()
+            ->arrayNode('class')->isRequired()
+            ->children()
+                ->arrayNode('model')->isRequired()
+                    ->children()
+                        ->scalarNode('proxy')->isRequired()->end()
                     ->end()
                 ->end()
+            ->end()
             ->end()
         ->end()
         ;

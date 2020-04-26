@@ -1,36 +1,37 @@
 <?php
 
-namespace WTeam\RequestBundle\Command;
+namespace Pretorien\RequestBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Pretorien\RequestBundle\Entity\ProxyManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use WTeam\RequestBundle\Entity\Proxy;
+use Pretorien\RequestBundle\Model\Proxy as Proxy;
 
 class ProxyListCommand extends Command
 {
-    protected static $defaultName = 'proxy:list';
-    private $em;
+    protected static $defaultName = 'pretorien:proxy:list';
+    private $proxyManager;
 
     public const FAILURE_WARNING = 1;
 
-    public function __construct(EntityManagerInterface $em, string $name = null)
+    public function __construct(ProxyManager $proxyManager, string $name = null)
     {
-        $this->em = $em;
+        $this->proxyManager = $proxyManager;
         parent::__construct($name);
     }
 
     protected function configure()
     {
-        $this->setDescription('Liste l\'ensemble des proxy');
+        $this->setDescription('List proxies');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $proxies = $this->em->getRepository(Proxy::class)->findBy([], ['enable' => 'DESC', 'lastLatency' => 'ASC']);
+        $proxies = $this->proxyManager->getRepository()->findBy([], ['enable' => 'DESC', 'lastLatency' => 'ASC']);
 
         $table = new Table($output);
         $table->setHeaders(['Hôte', 'Port', 'Latence', 'Activé', 'Nombre d\'erreurs', 'Dernière erreur', 'Dernière MAJ', 'Date de création']);
@@ -43,8 +44,10 @@ class ProxyListCommand extends Command
                     $proxy->getEnable() ? "Oui" : "Non",
                     $proxy->getFailure() > self::FAILURE_WARNING ? "<error>" . $proxy->getFailure() . "</error>" : $proxy->getFailure(),
                     $proxy->getLastFailure() ? $proxy->getLastFailure()->format("d/m/Y H:i:s") : '-',
-                    $proxy->getUpdatedAt() ? $proxy->getUpdatedAt()->format("d/m/Y H:i:s") : '-',
-                    $proxy->getCreatedAt() ? $proxy->getCreatedAt()->format("d/m/Y H:i:s") : '-',
+                    '',
+                    ''
+                    // $proxy->getUpdatedAt() ? $proxy->getUpdatedAt()->format("d/m/Y H:i:s") : '-',
+                    // $proxy->getCreatedAt() ? $proxy->getCreatedAt()->format("d/m/Y H:i:s") : '-',
                 ]);
             }
         } else {

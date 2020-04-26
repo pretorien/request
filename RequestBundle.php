@@ -1,6 +1,6 @@
 <?php
 
-namespace WTeam\RequestBundle;
+namespace Pretorien\RequestBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace WTeam\RequestBundle\DependencyInjection;
+namespace Pretorien\RequestBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -11,7 +11,10 @@ class RequestExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container)
     {
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new YamlFileLoader(
+            $container,
+            new FileLocator(__DIR__.'/../Resources/config')
+        );
         $loader->load('services.yml');
 
         $configuration = new Configuration();
@@ -19,5 +22,6 @@ class RequestExtension extends Extension
 
         $container->setParameter('request', $config);
         $container->setParameter('proxy', $config['proxy']);
+        $container->setParameter('pretorien_request.model.proxy.class', $config['class']['model']['proxy']);
     }
 }
