@@ -1,7 +1,7 @@
 {
     "name": "pretorien/request",
     "type": "symfony-bundle",
-    "description": "",
+    "description": "RequestBundle allows you to send public HTTP requests or through a proxy",
     "keywords": ["request","proxy","nordvpn"],
     "require": {
         "psr/log": "^1.1",
@@ -15,11 +15,5 @@
     },
     "autoload": {
         "psr-4": { "Pretorien\\RequestBundle\\": "" }
-    },
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0-dev"
-        }
     }
 }
