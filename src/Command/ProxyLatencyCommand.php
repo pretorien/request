@@ -29,7 +29,7 @@ class ProxyLatencyCommand extends Command
     private $requestService;
 
     public const POOL_SIZE = 5;
-    public const TEST_URL = "https://api.myip.com/";
+    public const TEST_URL = "https://api.nordvpn.com/vpn/check/full";
 
     protected function configure()
     {
