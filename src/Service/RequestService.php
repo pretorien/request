@@ -43,7 +43,7 @@ class RequestService
     public function createClient(array $options = []): Client
     {
         if (\is_null($options['client'])) {
-            return new Client($this->_proxyService, $options);
+            return new Client($this->_proxyService, $options['options']);
         } else {
             return $options['client'];
         }

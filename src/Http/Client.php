@@ -6,26 +6,37 @@ use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\HttpClientTrait;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Pretorien\RequestBundle\Http\Helpers\UserAgentGenerator;
 use Pretorien\RequestBundle\Http\Request\PoolRequest;
 use Pretorien\RequestBundle\Http\Request\Request;
 use Pretorien\RequestBundle\Http\Response\PoolResponse;
-use Pretorien\RequestBundle\Http\Response\Response;
 use Pretorien\RequestBundle\Service\ProxyService;
 
 class Client
 {
     use HttpClientTrait;
-    use LoggerAwareTrait; // setLogger
-
+	use LoggerAwareTrait {
+		setLogger as traitLogger;
+    }
+    
     private $_httpClient;
     private $_proxyService;
+    
+    public const DEFAULT_MAX_DURATION= 5;
+    public const DEFAULT_TIMEOUT= 2;
+    public const DEFAULT_HTTPVERSION = CURL_HTTP_VERSION_1_1;
+    public const DEFAULT_HEADERS = [];
+    public const DEFAULT_PROXY = null;
 
-    const TIMEOUT=2;
-    const MAX_DURATION=5;
+    public const CLIENT_DEFAULT_OPTIONS = [
+        'timeout'    => Client::DEFAULT_TIMEOUT,
+        'http_version' => Client::DEFAULT_HTTPVERSION,
+        'headers' => Client::DEFAULT_HEADERS,
+        'proxy' => Client::DEFAULT_PROXY,
+        'max_duration' => Client::DEFAULT_MAX_DURATION
+    ];
 
     /**
      * Client constructor
@@ -33,10 +44,20 @@ class Client
      * @param ProxyService $proxyService
      * @param array $options
      */
-    public function __construct(ProxyService $proxyService, array $options = [])
+    public function __construct(ProxyService $proxyService, array $defaultOptions = [])
     {
         $this->_proxyService = $proxyService;
-        $this->_httpClient = self::createClient([]);
+        $this->_httpClient = self::createClient($defaultOptions);
+    }
+
+    public function setLogger(\Psr\Log\LoggerInterface $logger)
+    {
+        $this->traitLogger($logger);
+        $this->_httpClient->setLogger($logger);
+    }
+
+    public function getHttpClient(){
+        return $this->_httpClient;
     }
 
     /**
@@ -79,50 +100,27 @@ class Client
     /**
      * Create HttpClient according to the specified options
      *
-     * @param array $options
+     * @param array $defaultOptions     Default request's options
      * @return HttpClientInterface
      */
-    public static function createClient(array $options = []): HttpClientInterface
+    public static function createClient(array $defaultOptions = [], int $maxHostConnections = 6): HttpClientInterface
     {
-        $resolver = new OptionsResolver();
-        $resolver->setDefaults(
-            [
-                'user_agent' => UserAgentGenerator::random(),
-                'cookies'    => false,
-                'timeout'    => Client::TIMEOUT,
-                'http_version' => CURL_HTTP_VERSION_1_1,
-                'headers' => [],
-                'proxy' => null,
-                'max_duration' => Client::MAX_DURATION
-            ]
-        );
-        $resolver->setAllowedTypes('cookies', 'bool');
-        $resolver->setAllowedTypes('user_agent', ['null', 'string']);
-        $resolver->setAllowedValues(
-            'http_version',
-            [
-                CURL_HTTP_VERSION_1_1,
-                CURL_HTTP_VERSION_2_0,
-                CURL_HTTP_VERSION_1_0
-            ]
+
+        $options = array_merge(
+            HttpClientInterface::OPTIONS_DEFAULTS, 
+            self::CLIENT_DEFAULT_OPTIONS, 
+            $defaultOptions
         );
 
-        $options = $resolver->resolve($options);
+        // Dynamic options configuration
+        if (
+            !isset($options['headers']['user-agent']) ||
+            is_null($options['headers']['user-agent'])
+        ) {
+            $options['headers']['user-agent'] = UserAgentGenerator::random();
+        }
 
-        // Paramétrage des options
-        $clientOptions['headers'] = $options['headers'];
-        $clientOptions['headers']['user-agent'] = $options['user_agent'];
-        // if($options['cookies']){
-        //     $clientOptions['headers']['cookies'] = self::createCookieJar();
-        // }
-
-        // On positionne la configuration par défaut
-        $clientOptions['verify_peer'] = false;
-        $clientOptions['verify_host'] = false;
-        $clientOptions['timeout'] = $options['timeout'];
-        $clientOptions['http_version'] = $options['http_version'];
-
-        return HttpClient::create($clientOptions);
+        return HttpClient::create($options, $maxHostConnections);
     }
 
     /**
