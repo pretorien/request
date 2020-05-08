@@ -2,14 +2,12 @@
 
 namespace Pretorien\RequestBundle\Command;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Pretorien\RequestBundle\Entity\ProxyManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Pretorien\RequestBundle\Model\Proxy as Proxy;
 
 class ProxyListCommand extends Command
 {
@@ -34,14 +32,14 @@ class ProxyListCommand extends Command
         $proxies = $this->proxyManager->getRepository()->findBy([], ['enable' => 'DESC', 'lastLatency' => 'ASC']);
 
         $table = new Table($output);
-        $table->setHeaders(['Hôte', 'Port', 'Latence', 'Activé', 'Nombre d\'erreurs', 'Dernière erreur', 'Dernière MAJ', 'Date de création']);
+        $table->setHeaders(['Host', 'Port', 'Latency', 'Activated', 'Number of errors', 'Last error', 'Updated at', 'Created at']);
         if (count($proxies) > 0) {
             foreach ($proxies as $proxy) {
                 $table->addRow([
                     $proxy->getHost(),
                     $proxy->getPort(),
                     $proxy->getLastLatency() ?  $proxy->getLastLatency() . ' ms' : '-',
-                    $proxy->getEnable() ? "Oui" : "Non",
+                    $proxy->getEnable() ? "Yes" : "No",
                     $proxy->getFailure() > self::FAILURE_WARNING ? "<error>" . $proxy->getFailure() . "</error>" : $proxy->getFailure(),
                     $proxy->getLastFailure() ? $proxy->getLastFailure()->format("d/m/Y H:i:s") : '-',
                     '',
@@ -51,7 +49,7 @@ class ProxyListCommand extends Command
                 ]);
             }
         } else {
-            $table->addRow([new TableCell('Aucun proxy présent en base', ['colspan' => 8])]);
+            $table->addRow([new TableCell('No proxy in database', ['colspan' => 8])]);
         }
 
         $table->render();
